@@ -30,6 +30,11 @@ include_directories(${EIGEN3_INCLUDE_DIR}
 add_subdirectory(src)
 
 
+add_executable(testPinholeProjectFactor  test/testPinholeProjectFactor.cpp)
+target_link_libraries(testPinholeProjectFactor ${PROJECT_NAME} )
+
+
+
 add_executable(testMarginalization  test/testMarginalization.cpp)
 target_link_libraries(testMarginalization ${PROJECT_NAME} )
 
