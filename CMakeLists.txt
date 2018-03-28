@@ -34,6 +34,10 @@ add_executable(testPinholeProjectFactor  test/testPinholeProjectFactor.cpp)
 target_link_libraries(testPinholeProjectFactor ${PROJECT_NAME} )
 
 
+add_executable(testProjectError  test/testProjectError.cpp)
+target_link_libraries(testProjectError ${PROJECT_NAME} )
+
+
 
 add_executable(testMarginalization  test/testMarginalization.cpp)
 target_link_libraries(testMarginalization ${PROJECT_NAME} )
