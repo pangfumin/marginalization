@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-set(PROJECT_NAME DeVio)
+set(PROJECT_NAME marginalization)
 project(${PROJECT_NAME})
 
 set(CMAKE_BUILD_TYPE release)
@@ -19,7 +19,7 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -mssse3" )
 
 find_package(Eigen3  REQUIRED)
 find_package(Ceres REQUIRED)
-find_package(glog REQUIRED)
+find_package(Glog REQUIRED)
 
 
 include_directories(${EIGEN3_INCLUDE_DIR}
