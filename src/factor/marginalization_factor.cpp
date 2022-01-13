@@ -95,7 +95,6 @@ void MarginalizationInfo::addResidualBlockInfo(ResidualBlockInfo *residual_block
     std::vector<double *> &parameter_blocks = residual_block_info->parameter_blocks;
     std::vector<int> parameter_block_sizes = residual_block_info->cost_function->parameter_block_sizes();
 
-
     for (int i = 0; i < static_cast<int>(residual_block_info->parameter_blocks.size()); i++)
     {
         double *addr = parameter_blocks[i];
@@ -147,43 +146,8 @@ int MarginalizationInfo::globalSize(int size) const
     return size == 6 ? 7 : size;
 }
 
-void* ThreadsConstructA(void* threadsstruct)
-{
-    ThreadsStruct* p = ((ThreadsStruct*)threadsstruct);
-    for (auto it : p->sub_factors)
-    {
-        for (int i = 0; i < static_cast<int>(it->parameter_blocks.size()); i++)
-        {
-            int idx_i = p->parameter_block_idx[reinterpret_cast<long>(it->parameter_blocks[i])];
-            int size_i = p->parameter_block_size[reinterpret_cast<long>(it->parameter_blocks[i])];
-            if (size_i == 7)
-                size_i = 6;
-            Eigen::MatrixXd jacobian_i = it->jacobians[i].leftCols(size_i);
-            for (int j = i; j < static_cast<int>(it->parameter_blocks.size()); j++)
-            {
-                int idx_j = p->parameter_block_idx[reinterpret_cast<long>(it->parameter_blocks[j])];
-                int size_j = p->parameter_block_size[reinterpret_cast<long>(it->parameter_blocks[j])];
-                if (size_j == 7)
-                    size_j = 6;
-                Eigen::MatrixXd jacobian_j = it->jacobians[j].leftCols(size_j);
-                if (i == j)
-                    p->A.block(idx_i, idx_j, size_i, size_j) += jacobian_i.transpose() * jacobian_j;
-                else
-                {
-                    p->A.block(idx_i, idx_j, size_i, size_j) += jacobian_i.transpose() * jacobian_j;
-                    p->A.block(idx_j, idx_i, size_j, size_i) = p->A.block(idx_i, idx_j, size_i, size_j).transpose();
-                }
-            }
-            p->b.segment(idx_i, size_i) += jacobian_i.transpose() * it->residuals;
-        }
-    }
-    return threadsstruct;
-}
-
 void MarginalizationInfo::marginalize()
 {
-
-
     // re-order the marginalization parts and residual parts
     // Marginalizations lie first, followed by the residual parts.
     // m for total size to marginalize; n for the totall size of residual
@@ -207,7 +171,6 @@ void MarginalizationInfo::marginalize()
     }
 
     n = pos - m;
-
 
     // Form the Linear H * dx = -b
     Eigen::MatrixXd H(pos, pos);
@@ -238,45 +201,6 @@ void MarginalizationInfo::marginalize()
         }
     }
     //ALGO_INFO("summing up costs %f ms", t_summing.toc());
-
-    
-//    std::cout<<"b: "<<b.transpose()<<std::endl;
-    /*
-    //multi thread
-    TicToc t_thread_summing;
-    pthread_t tids[NUM_THREADS];
-    ThreadsStruct threadsstruct[NUM_THREADS];
-    int i = 0;
-    for (auto it : factors)
-    {
-        threadsstruct[i].sub_factors.push_back(it);
-        i++;
-        i = i % NUM_THREADS;
-    }
-    for (int i = 0; i < NUM_THREADS; i++)
-    {
-        TicToc zero_matrix;
-        threadsstruct[i].A = Eigen::MatrixXd::Zero(pos,pos);
-        threadsstruct[i].b = Eigen::VectorXd::Zero(pos);
-        threadsstruct[i].parameter_block_size = parameter_block_size;
-        threadsstruct[i].parameter_block_idx = parameter_block_idx;
-        int ret = pthread_create( &tids[i], NULL, ThreadsConstructA ,(void*)&(threadsstruct[i]));
-        if (ret != 0)
-        {
-            ALGO_WARN("pthread_create error");
-            ALGO_BREAK();
-        }
-    }
-    for( int i = NUM_THREADS - 1; i >= 0; i--)  
-    {
-        pthread_join( tids[i], NULL ); 
-        A += threadsstruct[i].A;
-        b += threadsstruct[i].b;
-    }
-    //ROS_DEBUG("thread summing up costs %f ms", t_thread_summing.toc());
-    //ROS_INFO("A diff %f , b diff %f ", (A - tmp_A).sum(), (b - tmp_b).sum());
-
-     */
 
     //TODO
     Eigen::MatrixXd Hmm = 0.5 * (H.block(0, 0, m, m) + H.block(0, 0, m, m).transpose());
@@ -391,7 +315,6 @@ bool MarginalizationFactor::EvaluateWithMinimalJacobians(double const *const *pa
         Eigen::VectorXd x = Eigen::Map<const Eigen::VectorXd>(parameters[i], size);
         Eigen::VectorXd x0 = Eigen::Map<const Eigen::VectorXd>(marginalization_info->keep_block_data[i], size);
 //        std::cout<<"X: "<<x.transpose()<<std::endl;
-//
 //        std::cout<<"X0: "<<x0.transpose()<<std::endl;
         // delta chi
         if (size != 7)
