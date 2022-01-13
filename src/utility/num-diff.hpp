@@ -1,9 +1,8 @@
-/*! a simple tools to do finity num-diff
+/*! A simple tools to do finity num-diff
  *
- * Filename: NumbDifferentiator.hpp
+ * Filename: num-diff.hpp
  * Version: 0.10
- * Algo team, Ninebot Inc., 2017
- * Author: Pang Fumin (fumin.pang@ninebot.com)
+ * Author: Pang Fumin 
  */
 
 #ifndef NUMBDIFFERENTIATOR_H
@@ -25,12 +24,12 @@
   */
 
 template<typename Functor,int ParamBlockSize /* num of parameter blocks */>
-class NumbDifferentiator{
+class NumDiff{
 
 public:
 
 
-    NumbDifferentiator(Functor* ptrErrorFunctor):
+    NumDiff(Functor* ptrErrorFunctor):
             ptrErrorFunctor_(ptrErrorFunctor){
 
         if(ptrErrorFunctor_ == NULL){
@@ -58,6 +57,7 @@ public:
                  unsigned int paramId,
                  double* jacobiansMinimal){
 
+        
         std::shared_ptr<LoaclPrameter> ptrlocalParemeter(new LoaclPrameter);
         Eigen::Map<Eigen::Matrix<double,ResidualDim,MinimalParamDim,Eigen::RowMajor>> miniJacobian(jacobiansMinimal);
         Eigen::Map<Eigen::Matrix<double,ParamDim,1>> xi(parameters[paramId]);
@@ -94,51 +94,14 @@ public:
         return true;
     };
 
-    /**
-     * A better solustion ?!
-     */
-    template <int ResidualDim>
-    bool df_r_1D_x(double** parameters,
-                 unsigned int paramId,
-                 double* jacobian){
-
-            Eigen::Map<Eigen::Matrix<double, ResidualDim, 1>> Jacobian(jacobian);
-            Eigen::Map<Eigen::Matrix<double, 1, 1>> xi(parameters[paramId]);
-            Eigen::Matrix<double, ResidualDim, 1> residual_plus;
-            Eigen::Matrix<double, ResidualDim, 1> residual_minus;
-
-            Eigen::Matrix<double, 1, 1> xi_plus_delta, xi_minus_delta;
-            Eigen::Matrix<double, 1, 1> delta;
-
-            for (unsigned int i = 0; i < 1; i++) {
-
-                delta.setZero();
-                delta(i) = Eps;
-                xi_plus_delta = xi + delta;
-                double *parameter_plus[ParamBlockSize];
-                applyDistribance(parameters, xi_plus_delta.data(), parameter_plus, paramId);
-                ptrErrorFunctor_->Evaluate(parameter_plus, residual_plus.data(), NULL);
-
-
-                xi_minus_delta = xi - delta;
-                double *parameter_minus[ParamBlockSize];
-                applyDistribance(parameters, xi_minus_delta.data(), parameter_minus, paramId);
-                ptrErrorFunctor_->Evaluate(parameter_minus, residual_minus.data(), NULL);
-
-                Jacobian.col(i) = (residual_plus - residual_minus) / (2.0 * Eps);
-
-            }
-
-        return true;
-    };
-
     template <int ResidualDim,
             int ParamDim>
     bool df_r_xi(double** parameters,
                  unsigned int paramId,
                  double* jacobian){
+        typedef Eigen::Matrix<double, ResidualDim, ParamDim, (ParamDim > 1? Eigen::RowMajor : Eigen::ColMajor)> JocabinType;
 
-        Eigen::Map<Eigen::Matrix<double, ResidualDim, ParamDim, Eigen::RowMajor>> Jacobian(jacobian);
+        Eigen::Map<JocabinType> Jacobian(jacobian);
         Eigen::Map<Eigen::Matrix<double, ParamDim, 1>> xi(parameters[paramId]);
         Eigen::Matrix<double, ResidualDim, 1> residual_plus;
         Eigen::Matrix<double, ResidualDim, 1> residual_minus;

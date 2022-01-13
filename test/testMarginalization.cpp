@@ -3,7 +3,7 @@
 
 #include "../src/factor/marginalization_factor.h"
 #include <iostream>
-#include "../src/utility/NumbDifferentiator.hpp"
+#include "../src/utility/num-diff.hpp"
 #include "../src/factor/pose_local_parameterization.h"
 void T2double(Eigen::Isometry3d& T,double* ptr){
 
@@ -173,6 +173,8 @@ int main(){
     /*
      * Jacobian Check: compare the analytical jacobian to num-diff jacobian
      */
+
+    std::cout << " --------------------- jacobian check ----------------" << std::endl;
     // disturbance
     Eigen::Isometry3d param_T0, param_T1;
     Eigen::Isometry3d param_T0_noised, param_T1_noised;
@@ -208,7 +210,7 @@ int main(){
     Eigen::Matrix<double,12,6,Eigen::RowMajor> num_jacobian0_min;
     Eigen::Matrix<double,12,6,Eigen::RowMajor> num_jacobian1_min;
 
-    NumbDifferentiator<MarginalizationFactor,2> localizer_num_differ(marginalization_factor);
+    NumDiff<MarginalizationFactor,2> localizer_num_differ(marginalization_factor);
 
     localizer_num_differ.df_r_xi<12,7,6,PoseLocalParameterization>(parameters_noised,0,num_jacobian0_min.data());
 

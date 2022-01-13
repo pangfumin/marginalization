@@ -1,6 +1,6 @@
 #include "../src/factor/project_error.h"
 #include <iostream>
-#include "../src/utility/NumbDifferentiator.hpp"
+#include "../src/utility/num-diff.hpp"
 #include "../src/factor/pose_local_parameterization.h"
 void T2double(Eigen::Isometry3d& T,double* ptr){
 
@@ -122,7 +122,7 @@ int main(){
     Eigen::Matrix<double,2,6,Eigen::RowMajor> num_jacobian0_min;
     Eigen::Matrix<double,2,3,Eigen::RowMajor> num_jacobian1_min;
 
-    NumbDifferentiator<ProjectError,2> num_differ(projectFactor);
+    NumDiff<ProjectError,2> num_differ(projectFactor);
 
     num_differ.df_r_xi<2,7,6,PoseLocalParameterization>(parameters_noised,0,num_jacobian0_min.data());
 

@@ -1,6 +1,6 @@
 #include "../src/factor/pinhole_project_factor.h"
 #include <iostream>
-#include "../src/utility/NumbDifferentiator.hpp"
+#include "../src/utility/num-diff.hpp"
 #include "../src/factor/pose_local_parameterization.h"
 void T2double(Eigen::Isometry3d& T,double* ptr){
 
@@ -145,7 +145,7 @@ int main(){
     Eigen::Matrix<double,2,6,Eigen::RowMajor> num_jacobian2_min;
     Eigen::Matrix<double,2,1> num_jacobian3_min;
 
-    NumbDifferentiator<PinholeProjectFactor,4> localizer_num_differ(pinholeProjectFactor);
+    NumDiff<PinholeProjectFactor,4> localizer_num_differ(pinholeProjectFactor);
 
     localizer_num_differ.df_r_xi<2,7,6,PoseLocalParameterization>(parameters_noised,0,num_jacobian0_min.data());
 
@@ -172,7 +172,7 @@ int main(){
     localizer_num_differ.isJacobianEqual<2,6>(jacobian2_min.data(),num_jacobian2_min.data(),1e-2);
 
 
-    localizer_num_differ.df_r_1D_x<2>(parameters_noised,3,num_jacobian3_min.data());
+    localizer_num_differ.df_r_xi<2,1>(parameters_noised,3,num_jacobian3_min.data());
     std::cout<<"jacobian3_min: "<<std::endl<<jacobian3_min<<std::endl;
     std::cout<<"num_jacobian3_min: "<<std::endl<<num_jacobian3_min<<std::endl;
 
