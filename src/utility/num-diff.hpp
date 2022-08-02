@@ -16,7 +16,7 @@
 
 /**
   *  A simple class to do quickly finite differencing of an error functor to get
-  *  a numberic-diff jacobian for minimal parameterization.
+  *  a numeric-diff jacobian for minimal parameterization.
   *
   *  You can also use ceres::GradientChecker.
   *
