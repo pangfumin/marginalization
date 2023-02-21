@@ -144,8 +144,8 @@ class Utility
             two_pi * std::floor((-angle_degrees + T(180)) / two_pi);
     };
 
-    static  Eigen::Matrix4d quatPlus(Eigen::Quaterniond& quat); // left
-    static  Eigen::Matrix4d quatOplus(Eigen::Quaterniond& quat); // right
+    static  Eigen::Matrix4d quatPlus(const Eigen::Quaterniond& quat); // left
+    static  Eigen::Matrix4d quatOplus(const Eigen::Quaterniond& quat); // right
 
 
     static Eigen::Matrix<double,6,1> Isometry3dMinus(Eigen::Isometry3d pose_plus_delta, Eigen::Isometry3d pose){
@@ -163,9 +163,6 @@ class Utility
     };
 
     static void double2T(double* ptr,Eigen::Isometry3d& T){
-
-
-
         Eigen::Vector3d trans;
         trans(0) = ptr[0];
         trans(1) = ptr[1];
@@ -182,5 +179,25 @@ class Utility
         T.matrix().topLeftCorner(3,3) = q.toRotationMatrix();
         T.matrix().topRightCorner(3,1) = trans;
     }
+
+    static Eigen::Matrix<double, 3, 4, Eigen::RowMajor> lift(Eigen::Quaterniond& quat) {
+        Eigen::Matrix<double, 3, 4> lift
+            = 2 * Utility::quatPlus(quat).transpose().topRows(3);
+        return lift;
+    }
+
+    static Eigen::Matrix<double, 6, 7, Eigen::RowMajor> poseLift(Eigen::Quaterniond& quat) {
+        Eigen::Matrix<double, 6, 7> lift;
+        lift.setZero();
+            // = 2 * Utility::Qleft(quat).transpose().topRows(3);
+
+        lift.block<3,3>(0,0).setIdentity();
+        lift.block<3,4>(3,3) = 2 * Utility::quatPlus(quat).transpose().topRows(3);
+
+        return lift;
+    }
+
+
+
 
 };

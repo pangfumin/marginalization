@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../src/utility/num-diff.hpp"
 #include "../src/factor/pose_local_parameterization.h"
+#include <ceres/gradient_checker.h>
 void T2double(Eigen::Isometry3d& T,double* ptr){
 
     Eigen::Vector3d trans = T.matrix().topRightCorner(3,1);
@@ -175,6 +176,35 @@ int main(){
     localizer_num_differ.df_r_xi<2,1>(parameters_noised,3,num_jacobian3_min.data());
     std::cout<<"jacobian3_min: "<<std::endl<<jacobian3_min<<std::endl;
     std::cout<<"num_jacobian3_min: "<<std::endl<<num_jacobian3_min<<std::endl;
+
+
+    // gradient checker
+
+    ceres::NumericDiffOptions numeric_diff_options;
+    numeric_diff_options.ridders_relative_initial_step_size = 1e-3;
+
+    std::vector<const ceres::LocalParameterization*> local_parameterizations;
+    PoseLocalParameterization* local_param = new PoseLocalParameterization();
+    local_parameterizations.push_back(local_param);
+    local_parameterizations.push_back(local_param); // bg
+    local_parameterizations.push_back(local_param); // v
+    local_parameterizations.push_back(NULL); // ba
+
+    ceres::GradientChecker gradient_checker(
+            pinholeProjectFactor, &local_parameterizations, numeric_diff_options);
+    ceres::GradientChecker::ProbeResults results;
+
+    gradient_checker.Probe(parameters_noised, 1e-9, &results);
+    for (int i = 0; i < 4; i++) {
+        // CHECK_EQ((results.local_jacobians.at(i) 
+        //         - results.local_numeric_jacobians.at(i)).squaredNorm() < 1e-5, true) 
+            // << "jacobian error " << i << " is large: " 
+            LOG(INFO) << "check jacobian " << i << " "
+            << (results.local_jacobians.at(i) 
+                - results.local_numeric_jacobians.at(i)).squaredNorm() << " \n"
+            << "local_jacobians: \n" <<  results.local_jacobians.at(i) << " \n " 
+            << "local_numeric_jacobians: \n" << results.local_numeric_jacobians.at(i);
+    }
 
     return 0;
 }

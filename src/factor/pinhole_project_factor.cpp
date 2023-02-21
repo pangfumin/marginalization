@@ -81,7 +81,13 @@ bool PinholeProjectFactor::EvaluateWithMinimalJacobians(double const *const *par
 
             jacobian0_min = squareRootInformation_*jacobian0_min;
 
-            jacobian0 << jacobian0_min, Eigen::Matrix<double,2,1>::Zero(); // lift
+            Eigen::Matrix<double, 6,7, Eigen::RowMajor> lift = Utility::poseLift(Q_WI0);
+            // Eigen::Matrix<double, 7,6, Eigen::RowMajor> plus = Utility::poseLift(Q_WI0);
+
+            // std::cout << "left: " << lift << std::endl;
+            // jacobian0 << jacobian0_min, Eigen::Matrix<double,2,1>::Zero(); // lift
+            jacobian0 = jacobian0_min * lift;
+
 
             if(jacobiansMinimal != NULL && jacobiansMinimal[0] != NULL){
                 Eigen::Map<Eigen::Matrix<double,2,6,Eigen::RowMajor>> map_jacobian0_min(jacobiansMinimal[0]);
@@ -103,7 +109,10 @@ bool PinholeProjectFactor::EvaluateWithMinimalJacobians(double const *const *par
             jacobian1_min = H*tmp;
             jacobian1_min = squareRootInformation_*jacobian1_min;
 
-            jacobian1 << jacobian1_min, Eigen::Matrix<double,2,1>::Zero(); // lift
+             Eigen::Matrix<double, 6,7> lift = Utility::poseLift(Q_WI1);
+
+            // jacobian1 << jacobian1_min, Eigen::Matrix<double,2,1>::Zero(); // lift
+            jacobian1 = jacobian1_min * lift;
 
             if(jacobiansMinimal != NULL && jacobiansMinimal[1] != NULL){
                 Eigen::Map<Eigen::Matrix<double,2,6,Eigen::RowMajor>> map_jacobian1_min(jacobiansMinimal[1]);
@@ -126,7 +135,9 @@ bool PinholeProjectFactor::EvaluateWithMinimalJacobians(double const *const *par
             jacobian2_min = H*tmp;
             jacobian2_min = squareRootInformation_*jacobian2_min;
 
-            jacobian2 << jacobian2_min, Eigen::Matrix<double,2,1>::Zero(); // lift
+            // jacobian2 << jacobian2_min, Eigen::Matrix<double,2,1>::Zero(); // lift
+            Eigen::Matrix<double, 6,7> lift = Utility::poseLift(Q_IC);
+            jacobian2 = jacobian2_min * lift;
 
             if(jacobiansMinimal != NULL && jacobiansMinimal[2] != NULL){
                 Eigen::Map<Eigen::Matrix<double,2,6,Eigen::RowMajor>> map_jacobian2_min(jacobiansMinimal[2]);

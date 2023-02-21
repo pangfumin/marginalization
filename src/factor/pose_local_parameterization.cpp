@@ -1,4 +1,5 @@
 #include "pose_local_parameterization.h"
+#include "utility/utility.h"
 
 //Instances of LocalParameterization implement the ⊞ operation.
 bool PoseLocalParameterization::Plus(const double *x, const double *delta, double *x_plus_delta) const
@@ -25,12 +26,24 @@ bool PoseLocalParameterization::Plus(const double *x, const double *delta, doubl
 bool PoseLocalParameterization::ComputeJacobian(const double *x, double *jacobian) const
 {
     Eigen::Map<Eigen::Matrix<double, 7, 6, Eigen::RowMajor>> j(jacobian);
-    j.topRows<6>().setIdentity();
-    j.bottomRows<1>().setZero();
-
+    Eigen::Map<const Eigen::Quaterniond> _q(x + 3);
+    j.setZero();
+    j.block<3,3>(0,0).setIdentity();
+    j.block<4,3>(3,3) = 0.5 * Utility::quatPlus(_q).leftCols(3);
 
     return true;
 }
+
+// bool PoseLocalParameterization::plusJacobian(const double *x, double *jacobian) const
+// {
+//     Eigen::Map<Eigen::Matrix<double, 7, 6, Eigen::RowMajor>> j(jacobian);
+//     Eigen::Map<const Eigen::Quaterniond> _q(x + 3);
+//     j.setZero();
+//     j.block<3,3>(0,0).setIdentity();
+//     j.block<4,3>(3,3) = 0.5 * Utility::quatPlus(_q).leftCols(3);
+
+//     return true;
+// }
 
 
 

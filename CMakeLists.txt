@@ -22,7 +22,9 @@ find_package(Ceres REQUIRED)
 find_package(Glog REQUIRED)
 
 
-include_directories(${EIGEN3_INCLUDE_DIR}
+include_directories(
+        src
+        ${EIGEN3_INCLUDE_DIR}
         ${CERES_INCLUDE_DIRS})
 
 

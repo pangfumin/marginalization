@@ -43,7 +43,7 @@ Eigen::Matrix3d Utility::g2R(const Eigen::Vector3d &g)
     return R0;
 }
 
-Eigen::Matrix4d Utility::quatPlus(Eigen::Quaterniond& quat){
+Eigen::Matrix4d Utility::quatPlus(const Eigen::Quaterniond& quat){
     Eigen::Matrix4d L;
 
     double x = quat.x();
@@ -57,7 +57,7 @@ Eigen::Matrix4d Utility::quatPlus(Eigen::Quaterniond& quat){
     return L;
 
 }
-Eigen::Matrix4d Utility::quatOplus(Eigen::Quaterniond& quat){
+Eigen::Matrix4d Utility::quatOplus(const Eigen::Quaterniond& quat){
     Eigen::Matrix4d R;
 
     double x = quat.x();
@@ -71,3 +71,5 @@ Eigen::Matrix4d Utility::quatOplus(Eigen::Quaterniond& quat){
 
     return R;
 }
+
+
