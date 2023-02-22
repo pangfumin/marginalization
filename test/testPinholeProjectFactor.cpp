@@ -199,11 +199,11 @@ int main(){
         // CHECK_EQ((results.local_jacobians.at(i) 
         //         - results.local_numeric_jacobians.at(i)).squaredNorm() < 1e-5, true) 
             // << "jacobian error " << i << " is large: " 
-            LOG(INFO) << "check jacobian " << i << " "
+            LOG(INFO) << "check jacobian " << i << " diff: "
             << (results.local_jacobians.at(i) 
                 - results.local_numeric_jacobians.at(i)).squaredNorm() << " \n"
-            << "local_jacobians: \n" <<  results.local_jacobians.at(i) << " \n " 
-            << "local_numeric_jacobians: \n" << results.local_numeric_jacobians.at(i);
+            << "jacobians: \n" <<  results.local_jacobians.at(i) << " \n" 
+            << "numeric_jacobians: \n" << results.local_numeric_jacobians.at(i);
     }
 
     return 0;

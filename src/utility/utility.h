@@ -181,13 +181,13 @@ class Utility
     }
 
     static Eigen::Matrix<double, 3, 4, Eigen::RowMajor> lift(Eigen::Quaterniond& quat) {
-        Eigen::Matrix<double, 3, 4> lift
+        Eigen::Matrix<double, 3, 4, Eigen::RowMajor> lift
             = 2 * Utility::quatPlus(quat).transpose().topRows(3);
         return lift;
     }
 
     static Eigen::Matrix<double, 6, 7, Eigen::RowMajor> poseLift(Eigen::Quaterniond& quat) {
-        Eigen::Matrix<double, 6, 7> lift;
+        Eigen::Matrix<double, 6, 7, Eigen::RowMajor> lift;
         lift.setZero();
             // = 2 * Utility::Qleft(quat).transpose().topRows(3);
 
