@@ -57,7 +57,7 @@ bool ProjectError::EvaluateWithMinimalJacobians(double const *const *parameters,
             Eigen::Matrix<double, 3, 6> tmp;
             tmp.setIdentity();
             tmp.topLeftCorner(3,3) = - R_WC.transpose();
-            tmp.topRightCorner(3,3) =  - Utility::skewSymmetric(R_WC.transpose()*(Wp - t_WC));
+            tmp.topRightCorner(3,3) =   Utility::skewSymmetric(R_WC.transpose()*(Wp - t_WC));
 
             jacobian0_min  =  H*tmp;
 
